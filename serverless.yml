@@ -1,0 +1,77 @@
+service: hydrate-kinesis-dlq
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+
+functions:
+  kinesis:
+    handler: functions/kinesis.handler
+    events:
+      - stream:
+          type: kinesis
+          arn: !GetAtt KinesisStream.Arn
+          startingPosition: LATEST
+          maximumRetryAttempts: 3
+          bisectBatchOnFunctionError: true
+          destinations:
+            onFailure: 
+              arn: !Ref KinesisStreamDLQTopic
+              type: sns
+
+  hydrate:
+    handler: functions/hydrate.handler
+    destinations:
+      onSuccess: 
+        arn: !GetAtt KinesisStreamDLQ.Arn
+        type: sqs
+    events:
+      - sns:
+          arn: !Ref KinesisStreamDLQTopic
+          topicName: ${self:service}-${sls:stage}-dlq-topic
+
+  dynamodb:
+    handler: functions/dynamodb.handler
+    events:
+      - stream:
+          type: dynamodb
+          arn: !GetAtt DynamoDBTable.StreamArn
+          startingPosition: LATEST
+          maximumRetryAttempts: 3
+          bisectBatchOnFunctionError: true
+          destinations:
+            onFailure: 
+              arn: !Ref DynamoDBStreamDLQTopic
+              type: sns
+
+resources:
+  Resources:
+    DynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+    DynamoDBStreamDLQTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:service}-${sls:stage}-ddb-dlq-topic
+    KinesisStream:
+      Type: AWS::Kinesis::Stream
+      Properties:
+        ShardCount: 1
+    KinesisStreamDLQTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:service}-${sls:stage}-dlq-topic
+    KinesisStreamDLQ:
+      Type: AWS::SQS::Queue
+    

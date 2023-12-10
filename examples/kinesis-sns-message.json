@@ -1,0 +1,24 @@
+{
+  "requestContext": {
+    "requestId": "cf6fa2a6-48e2-49a6-bc23-7ed2b154b176",
+    "functionArn": "arn:aws:lambda:us-east-1:374852340823:function:hydrate-kinesis-dlq-dev-kinesis",
+    "condition": "RetryAttemptsExhausted",
+    "approximateInvokeCount": 4
+  },
+  "responseContext": {
+    "statusCode": 200,
+    "executedVersion": "$LATEST",
+    "functionError": "Unhandled"
+  },
+  "version": "1.0",
+  "timestamp": "2023-12-10T22:06:23.446Z",
+  "KinesisBatchInfo": {
+    "shardId": "shardId-000000000000",
+    "startSequenceNumber": "49647238774018758449143790847474952390342044683891376130",
+    "endSequenceNumber": "49647238774018758449143790941112301748593148785147772930",
+    "approximateArrivalOfFirstRecord": "2023-12-10T22:05:59.280Z",
+    "approximateArrivalOfLastRecord": "2023-12-10T22:06:19.196Z",
+    "batchSize": 3,
+    "streamArn": "arn:aws:kinesis:us-east-1:374852340823:stream/hydrate-kinesis-dlq-dev-KinesisStream-nrH7Hk48mKe2"
+  }
+}
