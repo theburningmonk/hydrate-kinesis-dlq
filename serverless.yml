@@ -60,18 +60,22 @@ resources:
         BillingMode: PAY_PER_REQUEST
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
+
     DynamoDBStreamDLQTopic:
       Type: AWS::SNS::Topic
       Properties:
         TopicName: ${self:service}-${sls:stage}-ddb-dlq-topic
+
     KinesisStream:
       Type: AWS::Kinesis::Stream
       Properties:
         ShardCount: 1
+
     KinesisStreamDLQTopic:
       Type: AWS::SNS::Topic
       Properties:
         TopicName: ${self:service}-${sls:stage}-dlq-topic
+        
     KinesisStreamDLQ:
       Type: AWS::SQS::Queue
     
