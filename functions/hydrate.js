@@ -21,7 +21,6 @@ module.exports.handler = async (event) => {
   })
   const shardIteratorResp = await kinesisClient.send(getShardIteratorCmd)
 
-
   const getRecordsCmd = new GetRecordsCommand({
     ShardIterator: shardIteratorResp.ShardIterator,
     Limit: batchSize,
